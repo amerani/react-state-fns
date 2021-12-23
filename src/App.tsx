@@ -3,11 +3,9 @@ import './App.css';
 import { useAppContext } from './store';
 
 export const App: ComponentType = () => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
   console.log(state);
-  const toggle = () => dispatch && dispatch({
-    type: 'toggle'
-  })
+  const toggle = () => state && (state.selected = !state?.selected);
   return (
     <div className="App">
       <header className="App-header">

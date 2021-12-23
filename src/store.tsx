@@ -21,8 +21,7 @@ export function defaultState() {
 }
 
 interface AppContext {
-  state: AppState
-  dispatch?: React.Dispatch<BaseAction>
+  state: AppState,
 }
 
 const AppContext = React.createContext<AppContext>({
@@ -42,16 +41,30 @@ const reducer = (
   }
 }
 
+
 export const ContextProvider: ComponentType = (
   children: any,
 ) => {
   const initialState = defaultState();
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const proxyHandler: ProxyHandler<AppState> = {
+    get(target, prop, receiver) {
+      if(prop === 'selected') {
+        return state.selected;
+      }
+    },
+    set(obj, prop, value) {
+      if(prop === 'selected') {
+        dispatch({ type: 'toggle' })
+      }
+      return true;
+    }
+  }
+  const proxy = new Proxy(state, proxyHandler);
   return (
     <>
     <AppContext.Provider value={{
-      state,
-      dispatch
+      state: proxy,
     }}>
       {children.children}
     </AppContext.Provider>
